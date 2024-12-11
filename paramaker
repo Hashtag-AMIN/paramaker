@@ -1,0 +1,532 @@
+#!/usr/bin/env python3
+
+import argparse,os,sys
+
+banner = r"""                                                   
+                                         _                 
+                                        | |                
+     ____  _____  ____ _____ ____  _____| |  _ _____  ____ 
+    |  _ \(____ |/ ___|____ |    \(____ | |_/ ) ___ |/ ___)
+    | |_| / ___ | |   / ___ | | | / ___ |  _ (| ____| |    
+    |  __/\_____|_|   \_____|_|_|_\_____|_| \_)_____)_|    
+    |_|                                                 
+   
+                               paramaker
+                    https://github.com/Hashtag-AMIN/   
+                    
+"""
+
+xss_param = [
+        "q",
+        "s",
+        "search",
+        "lang",
+        "keyword",
+        "query",
+        "page",
+        "keywords",
+        "year",
+        "view",
+        "email",
+        "type",
+        "name",
+        "p",
+        "callback",
+        "jsonp",
+        "api_key",
+        "api",
+        "password",
+        "email",
+        "emailto",
+        "token",
+        "username",
+        "csrf_token",
+        "unsubscribe_token",
+        "id",
+        "item",
+        "page_id",
+        "month",
+        "immagine",
+        "list_type",
+        "url",
+        "terms",
+        "categoryid",
+        "key",
+        "l",
+        "begindate",
+        "enddat",
+        "s",
+        "search",
+        "q",
+        "id",
+        "lang",
+        "keyword",
+        "query",
+        "page",
+        "keywords",
+        "year",
+        "view",
+        "email",
+        "type",
+        "name",
+        "p",
+        "month",
+        "image",
+        "list_type",
+        "url",
+        "terms",
+        "categoryid",
+        "key",
+        "login",
+        "begindate",
+        "enddate",
+    ]
+
+sqli_param = [
+        "category",
+        "class",
+        "column",
+        "date",
+        "delete",
+        "dir",
+        "fetch",
+        "field",
+        "file",
+        "filte",
+        "form",
+        "from",
+        "id",
+        "item",
+        "join",
+        "keyword",
+        "lang",
+        "main",
+        "menu",
+        "name",
+        "nav",
+        "news",
+        "number",
+        "order",
+        "page",
+        "params",
+        "process",
+        "query",
+        "ref",
+        "region",
+        "report",
+        "results",
+        "role",
+        "row",
+        "search",
+        "sel",
+        "select",
+        "sleep",
+        "sort",
+        "string",
+        "table",
+        "thread",
+        "title",
+        "topic",
+        "type",
+        "update",
+        "url",
+        "user",
+        "view",
+        "where",
+    ]
+
+lfi_param = [
+
+        "action",
+        "board",
+        "cat",
+        "conf",
+        "content",
+        "date",
+        "detail",
+        "dir",
+        "doc",
+        "document",
+        "download",
+        "file",
+        "folder",
+        "inc",
+        "include",
+        "layout",
+        "locate",
+        "mod",
+        "name",
+        "page",
+        "path",
+        "pdf",
+        "pg",
+        "php_path",
+        "prefix",
+        "root",
+        "show",
+        "site",
+        "style",
+        "template",
+        "type",
+        "ur",
+        "view",
+    ]
+
+redir_param = [
+        "Lmage_url",
+        "Open",
+        "callback",
+        "cgi-bin/redirect.cg",
+        "cgi-bin/redirect.cgi",
+        "checkout",
+        "checkout_url",
+        "continue",
+        "data",
+        "dest",
+        "destination",
+        "dir",
+        "domain",
+        "feed",
+        "file",
+        "file_name",
+        "file_url",
+        "folder",
+        "folder_url",
+        "forward",
+        "from_url",
+        "go",
+        "goto",
+        "host",
+        "html",
+        "image_url",
+        "img_url",
+        "load_file",
+        "load_url",
+        "loginto",
+        "login_url",
+        "logout",
+        "navigation",
+        "next",
+        "next_page",
+        "out",
+        "page",
+        "page_url",
+        "path",
+        "port",
+        "redir",
+        "redirect",
+        "redirect_to",
+        "redirect_uri",
+        "redirect_url",
+        "reference",
+        "return",
+        "returnTo",
+        "return_path",
+        "return_to",
+        "return_url",
+        "rt",
+        "rurl",
+        "show",
+        "site",
+        "target",
+        "to",
+        "uri",
+        "url",
+        "val",
+        "validate",
+        "view",
+        "windo",
+    ]
+
+rce_param = [
+        "cmd",
+        "exec",
+        "command",
+        "execute",
+        "ping",
+        "query",
+        "jump",
+        "code",
+        "reg",
+        "do",
+        "func",
+        "arg",
+        "option",
+        "load",
+        "process",
+        "step",
+        "read",
+        "function",
+        "req",
+        "feature",
+        "exe",
+        "module",
+        "payload",
+        "run",
+        "print",
+        "daemon",
+        "upload",
+        "dir",
+        "download",
+        "log",
+        "ip",
+        "cli",
+        "functio",
+    ]
+
+ssrf_param = [
+        "dest",
+        "redirect",
+        "uri",
+        "path",
+        "continue",
+        "url",
+        "window",
+        "next",
+        "data",
+        "reference",
+        "site",
+        "html",
+        "val",
+        "validate",
+        "domain",
+        "callback",
+        "return",
+        "page",
+        "feed",
+        "host",
+        "port",
+        "to",
+        "out",
+        "view",
+        "dir",
+        "access",
+        "admin",
+        "dbg",
+        "debug",
+        "edit",
+        "grant",
+        "test",
+        "alter",
+        "clone",
+        "create",
+        "delete",
+        "disable",
+        "enable",
+        "exec",
+        "execute",
+        "load",
+        "make",
+        "modify",
+        "rename",
+        "reset",
+        "shell",
+        "toggle",
+        "adm",
+        "root",
+        "cf",
+        "ou",
+        "show",
+        "navigation",
+        "open",
+        "file",
+        "document",
+        "folder",
+        "pg",
+        "php_path",
+        "style",
+        "doc",
+        "img",
+        "filename",
+    ]
+
+idor_param = [
+
+        "access",
+        "admin",
+        "dbg",
+        "debug",
+        "edit",
+        "grant",
+        "test",
+        "alter",
+        "clone",
+        "create",
+        "delete",
+        "disable",
+        "enable",
+        "exec",
+        "execute",
+        "load",
+        "make",
+        "modify",
+        "rename",
+        "reset",
+        "shell",
+        "toggle",
+        "adm",
+        "root",
+        "cfg",
+        "config",
+        "id",
+        "user",
+        "account",
+        "number",
+        "order",
+        "no",
+        "doc",
+        "key",
+        "email",
+        "group",
+        "profile",
+        "report",
+    ]
+
+ssti_param = [
+        "template",
+        "preview",
+        "id",
+        "view",
+        "activity",
+        "name",
+        "content",
+        "redirect",
+    ]
+
+
+class SingleMetavarFormatter(argparse.HelpFormatter):
+
+    def _format_action_invocation(self, action):
+
+        if not action.option_strings:
+            metavar, = self._metavar_formatter(action, action.dest)(1)
+            return metavar.upper()
+        else:
+            parts = []
+            parts.extend(action.option_strings)
+            if action.nargs != 0:
+                metavar = self._metavar_formatter(action, action.dest)(1)
+            return ' '.join(parts)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Generate query strings from a wordlist with unique values and chunking and top parameters.", formatter_class=SingleMetavarFormatter)
+    parser.add_argument("-w", "--wordlist", help="Path to the wordlist (parameter file)")
+    parser.add_argument("-k", "--keyword", help="Keyword for generating unique values, default: 'hashtag'",default="hashtag")
+    parser.add_argument("-c", "--chunk", type=int, help="Chunk size for splitting the wordlist, default: 20", default=20)
+    parser.add_argument("-nu", "--not-unique", action="store_true", help="Ignore to add suffix number for make unique parameter value")
+    parser.add_argument("-s", "--silent", action="store_true", help="Silent Mode")
+    parser.add_argument("-all", "--all", action="store_true", help="Add all Top Vulnerable Parameter")
+    parser.add_argument("-xss", "--xss", action="store_true", help="Add Top Vulnerable Parameter for XSS")
+    parser.add_argument("-sqli", "--sqli", action="store_true", help="Add Top Vulnerable Parameter for SQLI")
+    parser.add_argument("-lfi", "--lfi", action="store_true", help="Add Top Vulnerable Parameter for LFI")
+    parser.add_argument("-redir", "--redir", action="store_true", help="Add Top Vulnerable Parameter for Open Redirect")
+    parser.add_argument("-rce", "--rce", action="store_true", help="Add Top Vulnerable Parameter for RCE")
+    parser.add_argument("-ssrf", "--ssrf", action="store_true", help="Add Top Vulnerable Parameter for SSRF")
+    parser.add_argument("-idor", "--idor", action="store_true", help="Add Top Vulnerable Parameter for IDOR")
+    parser.add_argument("-ssti", "--ssti", action="store_true", help="Add Top Vulnerable Parameter for SSTI")
+    args = parser.parse_args()
+
+    wordlist = args.wordlist
+    keyword = args.keyword
+    chunk = args.chunk
+    not_uniq = args.not_unique
+    flag_silent = args.silent
+    flag_all = args.all
+    flag_xss = args.xss
+    flag_sqli = args.sqli
+    flag_lfi = args.lfi
+    flag_redir = args.redir
+    flag_rce = args.rce
+    flag_ssrf = args.ssrf
+    flag_idor = args.idor
+    flag_ssti = args.ssti
+
+    if not flag_silent:
+        print(banner)
+
+    if sum(bool(arg) for arg in [wordlist, flag_xss, flag_idor, flag_lfi, flag_rce, flag_redir, flag_sqli, flag_ssrf, flag_ssti, flag_all, not sys.stdin.isatty()]) < 1:
+        parser.error("[-] Need use atleast on of -w for parameter wordlist, attack type flag or come from stdin")
+        
+
+    if args.all and any([args.xss, args.sqli, args.lfi, args.redir, args.rce, args.ssrf, args.idor, args.ssti]):
+        parser.error("[-] The -all flag cannot be used with any other attack type flags (-xss, -sqli, -lfi, -redir, -rce, -ssrf, -idor, -ssti)")
+
+    if wordlist:
+        if not os.path.exists(wordlist):
+            parser.error("[-] Need exist file that include parameter for -w flag")
+
+    counter = 0
+    query_string = "?"
+    params = []
+
+    try:
+        if wordlist:
+            with open(wordlist, "r") as file:
+                params = file.readlines()
+                
+        if flag_xss:
+            params.extend(xss_param)
+
+        if flag_sqli:
+            params.extend(sqli_param)
+            
+        if flag_lfi:
+            params.extend(lfi_param)
+
+        if flag_redir:
+            params.extend(redir_param)
+        
+        if flag_rce:
+            params.extend(rce_param)
+
+        if flag_ssrf:
+            params.extend(ssrf_param)
+        
+        if flag_idor:
+            params.extend(idor_param)
+        
+        if flag_ssti:
+            params.extend(ssti_param)
+        
+        if flag_all:
+            for param_list in [xss_param, sqli_param, lfi_param, redir_param, rce_param, ssrf_param, idor_param, ssrf_param]:
+                params.extend(param_list)
+
+        if not sys.stdin.isatty():
+            stdin_param = [param.strip() for param in sys.stdin]
+            params.extend(stdin_param)
+            
+        uniq_params = list(set(params))
+
+        for line in uniq_params:
+            param = line.strip()
+            if not_uniq:
+                if keyword:
+                    counter += 1
+                    query_string += f"{param}={keyword}&"
+            
+                if counter == chunk:
+                    print(query_string[:-1])
+                    query_string = "?"
+                    counter = 0
+                    print()
+            else:
+                if keyword:
+                    counter += 1
+                    query_string += f"{param}={keyword}{counter}&"
+                
+                if counter == chunk:
+                    print(query_string[:-1])
+                    query_string = "?"
+                    counter = 0
+                    print()
+        
+        if counter > 0:
+            print(query_string[:-1])
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+if __name__ == "__main__":
+    main()
